@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Insight | Infrastructure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="shell.css">
+    <link rel="stylesheet" href="lab.css">
+    <script type="module">
+        import 'https://esm.run/@material/web/all.js';
+    </script>
+</head>
+
+<body>
+
+    <header class="top-app-bar">
+        <div class="app-title">
+            <span class="material-symbols-outlined">shield_with_heart</span>
+            <span>
+                The Digital City Initiative
+                <span class="subtitle"> | CIVIC INSIGHT</span>
+            </span>
+        </div>
+    </header>
+
+    <div class="app-shell">
+
+        <nav class="course-nav">
+            <!-- THE ACTIVE LAB IN THE NEXT FOUR BLOCKS -->
+            <div class="nav-item-global" onclick="showLab('lab1')">
+                <span class="material-symbols-outlined">map</span>
+                <span class="nav-label">City Infrastructure</span>
+            </div>
+            <div class="nav-item-global" onclick="showLab('lab2')">
+                <span class="material-symbols-outlined">security</span>
+                <span class="nav-label">Citizen Resource & Integrity</span>
+            </div>
+            <div class="nav-item-global active" onclick="showLab('lab3')">
+                <span class="material-symbols-outlined">commute</span>
+                <span class="nav-label">Civic Mobility & Logistics</span>
+            </div>
+            <div class="nav-item-global" onclick="showLab('lab4')">
+                <span class="material-symbols-outlined">engineering</span>
+                <span class="nav-label">Public Works & Urban Transportation</span>
+            </div>
+        </nav>
+
+        <div id="lab-workspace" class="workspace">
+
+            <!-- THE LAB SECTION STARTS HERE -->
+            <div class="content-container">
+                <div class="dashboard-layout"> <!-- LEFT SIDEBAR -->
+                    <aside class="control-column">
+                        <section class="panel-card">
+                            <div class="sidebar-title"> Operational Controls</div>
+                            <div class="button-stack">
+                                <md-filled-tonal-button onclick="dispatchServiceCallResponse()"><span slot="icon"
+                                        class="material-symbols-outlined"> local_shipping </span>
+                                    Service Call Response Dispatch
+                                </md-filled-tonal-button>
+                                <md-outlined-button onclick="optimizeHealthClinic()"><span slot="icon"
+                                        class="material-symbols-outlined"> volunteer_activism </span>
+                                    Mobile Clinic Optimization
+                                </md-outlined-button>
+                                <md-outlined-button onclick="precisionParatransit()"><span slot="icon"
+                                        class="material-symbols-outlined"> route </span>
+                                    Safe Paratransit Arrival
+                                </md-outlined-button>
+                            </div>
+                        </section>
+                        <section class="panel-card">
+                            <div class="sidebar-title"> Planning & Equity</div>
+                            <div class="button-stack">
+                                <md-outlined-button onclick="analyzeEnvironmentalImpact()"><span slot="icon"
+                                        class="material-symbols-outlined"> eco </span>
+                                    Sustainability & Fuel Analysis
+                                </md-outlined-button>
+                                <md-outlined-button onclick="assessNeighborhoodEquity()"><span slot="icon"
+                                        class="material-symbols-outlined"> balance </span>
+                                    Transit Equity Assessment
+                                </md-outlined-button>
+                                <div class="time-row">
+                                    <md-outlined-button onclick="modelPeakInfrastructure()"><span slot="icon"
+                                            class="material-symbols-outlined"> traffic </span>
+                                        Peak<br>Congestion<br>Modeling
+                                    </md-outlined-button>
+                                    <input type="time" id="departure-time" value="17:00">
+                                </div>
+                            </div>
+                        </section>
+                        <div class="link-actions">
+                            <button class="link-button" onclick="clearMarkersAndRoutes()"> Clear All Markers</button>
+                            <button class="link-button" onclick="resetPortal()"> Reset Dashboard View</button>
+                        </div>
+                    </aside> <!-- MAP -->
+                    <main class="map-column">
+                        <div id="map"></div>
+                        <p class="map-note"> Map data visualization for official municipal use only[cite: 7]. </p>
+                    </main>
+                    <!-- LOG -->
+                    <aside class="log-column">
+                        <section class="panel-card">
+                            <div class="panel-header"> Operational Data Stream</div>
+                            <div id="log-window" class="command-log"> // System Standby...</div>
+                        </section>
+                    </aside>
+                </div>
+            </div>
+            <!-- THE LAB SECTION ENDS HERE -->
+
+        </div>
+
+        <div id="unavailable-workspace" class="unavailable-workspace">
+            <div class="empty-state">
+                <span class="material-symbols-outlined lock-icon">lock</span>
+                <h2>NOT AVAILABLE IN THIS LAB</h2>
+                <p>
+                    <!-- THE LAB NUMBER ON THE NEXT LINE -->
+                    Please switch back to Lab 3
+                    to continue your Maps API work.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TASK 2: Initialize and secure the map -->
+    <!-- TODO: Replace "INSERT_YOUR_API_KEY_HERE" with the "API KEY" you just created -->
+
+    <script>
+        (g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({
+            key: "INSERT_YOUR_API_KEY_HERE",
+            v: "weekly",
+            // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+            // Add other bootstrap parameters as needed, using camel case.
+        });
+    </script>
+
+    <!-- END TASK 2: Initialize and secure the map -->
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

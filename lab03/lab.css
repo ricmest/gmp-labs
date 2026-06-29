@@ -1,0 +1,217 @@
+/* ==========================================
+LAB 3 - CIVIC MOBILITY & LOGISTICS
+Depends on:
+material-shell.css
+========================================== */
+
+.content-container {
+    padding: 16px;
+}
+
+/* ------------------------------------------
+Main dashboard layout
+------------------------------------------ */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns:
+        280px minmax(600px, 1fr) 360px;
+    gap: 16px;
+    align-items: start;
+}
+
+/* ------------------------------------------
+Left controls
+------------------------------------------ */
+
+.control-column {
+    min-width: 0;
+}
+
+.panel-card {
+    background: var(--md-sys-color-surface-container-high);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+
+.panel-header {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.button-stack md-filled-button,
+.button-stack md-outlined-button {
+    width: 100%;
+}
+
+.time-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.time-row md-outlined-button {
+    flex: 1;
+}
+
+#departure-time {
+    width: 110px;
+    height: 40px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 8px;
+    background: white;
+}
+
+/* ------------------------------------------
+Utility links
+------------------------------------------ */
+
+.link-actions {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.link-button {
+    background: transparent;
+    border: none;
+    padding: 6px 0;
+    cursor: pointer;
+    text-align: left;
+    color: #666;
+    font-size: 13px;
+}
+
+.link-button:hover {
+    color: var(--md-sys-color-primary);
+}
+
+/* ------------------------------------------
+Map area
+------------------------------------------ */
+
+.map-column {
+    min-width: 0;
+}
+
+#map {
+    width: 100%;
+    height: 500px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+
+.map-note {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+}
+
+/* ------------------------------------------
+Operations log
+------------------------------------------ */
+
+.log-column {
+    min-width: 0;
+}
+
+.command-log {
+    background: #1e1e1e;
+    color: #4af626;
+    font-family: Consolas,
+        Monaco,
+        monospace;
+    font-size: .85rem;
+    line-height: 1.5;
+    height: 540px;
+    overflow-y: auto;
+    padding: 12px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.command-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+.command-log::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .18);
+    border-radius: 4px;
+}
+
+/* ------------------------------------------
+Tablet
+------------------------------------------ */
+
+@media (max-width: 1400px) {
+
+    .dashboard-layout {
+        grid-template-columns:
+            260px minmax(450px, 1fr) 320px;
+    }
+
+}
+
+/* ------------------------------------------
+Small laptop
+------------------------------------------ */
+
+@media (max-width: 1100px) {
+
+    .dashboard-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+    .control-column,
+    .map-column,
+    .log-column {
+        width: 100%;
+    }
+
+    #map {
+        height: 450px;
+    }
+
+    .command-log {
+        height: 320px;
+    }
+
+}
+
+/* ------------------------------------------
+Mobile
+------------------------------------------ */
+
+@media (max-width: 768px) {
+
+    .content-container {
+        padding: 12px;
+    }
+
+    #map {
+        height: 320px;
+    }
+
+    .command-log {
+        height: 250px;
+    }
+
+}
