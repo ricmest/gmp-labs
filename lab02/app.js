@@ -2,8 +2,7 @@ let map, infoWindow, currentPlace, currentlySelectedMarker;
 
 async function initLab() {
 
-    // TASK 2: Initialize the Map
-    // TODO: Replace "INSERT YOUR MAP ID HERE" with the "MAP ID" you just created.
+    // TASK 3: Initialize the Map
 
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { Place, PlaceAutocompleteElement } = await google.maps.importLibrary("places");
@@ -11,51 +10,55 @@ async function initLab() {
     map = new Map(document.getElementById("map"), {
         center: { lat: 45.523, lng: -122.676 }, // Default city view
         zoom: 13,
+        // TODO: Replace "INSERT YOUR MAP ID HERE" with the "MAP ID" you just created.
         mapId: "INSERT YOUR MAP ID HERE" // This is necessary to enable Cloud Styling and use AdvancedMarkerElement
     });
     map.markersArray = [];
     infoWindow = new InfoWindow();
 
-    // END TASK 2: Initialize the Map
+    // END TASK 3: Initialize the Map
 
-    // TASK 3: Smart Autocomplete
+    // TASK 4: Smart Autocomplete
     // TODO: Allow selection of addresses in the US with autocomplete
 
     // TODO: Selection of address displays details under the text box
 
-    // END TASK 3: Smart Autocomplete
+    // END TASK 4: Smart Autocomplete
 
     document.getElementById("validate-btn").addEventListener("click", async () => {
         if (!currentPlace) return alert("Select an address first!");
 
 
-        // TASK 4: Address validation
+        // TASK 5: Address validation
         // TODO: Validate the selected address
 
         // TODO: Display validation results
 
-        // END TASK 4: Address validation
+        // END TASK 5: Address validation
 
-        // TASK 5: Geolocation
+        // TASK 6: Geolocation
+        // TODO: Add the "Find my position" feature to the map
 
-        // END TASK 5: Geolocation
+        // END TASK 6: Geolocation
 
     });
 
     document.getElementById("find-clinics").addEventListener("click", async () => {
 
-        // TASK 6: Proximity SEARCH (Health Clinics)
+        // TASK 7: Proximity SEARCH (Health Clinics)
         // TODO: Generate markers for health clinics and EV charging stations
 
-        // END TASK 6: Proximity SEARCH (Health Clinics)
+        // END TASK 7: Proximity SEARCH (Health Clinics)
 
     });
 
     document.getElementById("find-ev").addEventListener("click", async () => {
 
-        // TASK 7: TEXT SEARCH (EV Charging)
+        // TASK 8: TEXT SEARCH (EV Charging)
+        // TODO: Find and display nearby EV charging stations
 
-        // END TASK 7: TEXT SEARCH (EV Charging)
+
+        // END TASK 8: TEXT SEARCH (EV Charging)
 
     });
 }
@@ -65,7 +68,7 @@ initLab();
 
 /* --- HELPER FUNCTIONS FROM HERE --- */
 
-// TASK 8: Implementing Map Markers and UI Helpers
+// TASK 9: Implementing Map Markers and UI Helpers
 
 // TODO: Helper to generate a list and markers for a list of places
 
@@ -73,12 +76,12 @@ initLab();
 
 // TODO: Helper to display results in the sidebar   
 
-// END TASK 8: Implementing Map Markers and UI Helpers
+// END TASK 9: Implementing Map Markers and UI Helpers
 
-// TASK 9: Accessibility & Operational Awareness    
+// TASK 10: Accessibility & Operational Awareness    
 // TODO: Shared helper to show place details in InfoWindow
 
-// END TASK 9: Accessibility & Operational Awareness  
+// END TASK 10: Accessibility & Operational Awareness  
 
 /* --- NAVIGATION LOGIC --- */
 function showLab(labId) {
