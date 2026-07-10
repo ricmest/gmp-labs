@@ -1,0 +1,111 @@
+.dashboard {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  width: 340px;
+  background: var(--md-sys-color-surface);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 24px;
+  color: var(--md-sys-color-primary);
+}
+
+.control-group {
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+
+.control-group h3 {
+  margin-top: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #666;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.switch-row label {
+  font-size: 14px;
+}
+
+.status-box {
+  margin-top: 12px;
+}
+
+#autocomplete-container {
+  margin-bottom: 12px;
+}
+
+#address-input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+#pano-container {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 340px;
+}
+
+#pano {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid white;
+  background: black;
+  min-height: 20px;
+}
+
+#address-descriptor {
+  background: rgba(255, 255, 255, .96);
+  padding: 16px;
+  font-size: 14px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+gmp-place-autocomplete {
+  width: 100%;
+}
+
+gmp-place-autocomplete input {
+  width: 100%;
+}
+
+.site-details h5,
+.district-details h5 {
+  margin-top: 0;
+}
+
+.priority-button {
+  width: 100%;
+}
