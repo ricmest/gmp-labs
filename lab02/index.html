@@ -125,16 +125,13 @@
                 }));
             d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
         })({
-            // TODO: Replace "INSERT_YOUR_API_KEY_HERE" with the "API KEY" you just created -->
+            // TODO: Replace "INSERT_YOUR_API_KEY_HERE" with the "API KEY" you just created
             key: "INSERT_YOUR_API_KEY_HERE",
             v: "weekly",
             // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
             // Add other bootstrap parameters as needed, using camel case.
         });
     </script>
-
-    <!-- END TASK 2: Initialize and secure the map -->
-
     <script src="app.js"></script>
 
 </body>
