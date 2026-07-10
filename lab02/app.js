@@ -10,7 +10,7 @@ async function initLab() {
     map = new Map(document.getElementById("map"), {
         center: { lat: 45.523, lng: -122.676 }, // Default city view
         zoom: 13,
-        // TODO: Replace "INSERT YOUR MAP ID HERE" with the "MAP ID" you just created.
+        // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
         mapId: "INSERT YOUR MAP ID HERE" // This is necessary to enable Cloud Styling and use AdvancedMarkerElement
     });
     map.markersArray = [];
