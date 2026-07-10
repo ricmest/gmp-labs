@@ -4,7 +4,6 @@ const cityHallCoords = { lat: 37.7792, lng: -122.4192 }; // Default San Francisc
 async function initMap() {
 
     // TASK 4: Initialize the Map
-    // TODO: Replace "INSERT YOUR MAP ID HERE" with the "MAP ID" you just created.
 
     // Request libraries when needed, not in the script tag.
     const { Map } = await google.maps.importLibrary("maps");
@@ -12,6 +11,7 @@ async function initMap() {
     map = new Map(document.getElementById("map"), {
         center: cityHallCoords,
         zoom: 13,
+        // TODO: Replace "INSERT YOUR MAP ID HERE" with the "MAP ID" you just created.
         mapId: "INSERT_YOUR_MAP_ID_HERE",
     });
     // END TASK 4: Initialize the Map

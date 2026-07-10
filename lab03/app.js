@@ -43,6 +43,7 @@ async function dispatchServiceCallResponse() {
     await setOrigin(originTransportAgencyCoords, originTransportAgencyName);
 
     // TASK 4: Send a request to get traffic aware routing between two points
+    // TODO: Configure a TRAFFIC_AWARE request and calculate the route
 
     // END TASK 4: Send a request to get traffic aware routing between two points
 }
@@ -62,6 +63,7 @@ async function optimizeHealthClinic() {
     await setOrigin(originGeneralHospitalCoords, originGeneralHospitalName);
 
     // TASK 5: Send a request to get an optimized route along several waypoints
+    // TODO: enable optimization and process the reordered waypoints
 
     // END TASK 5. Send a request to get an optimized route along several waypoints
 }
