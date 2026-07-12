@@ -2,32 +2,33 @@ let map, infoWindow, currentPlace, currentlySelectedMarker;
 
 async function initLab() {
 
-    <!-- TASK 1: Initialize and secure the map -->
-    <!-- TODO: Initialize the map and create a map style on the Cloud Console -->
-    <!-- 1. Create a Map Style and corresponding ID to use here (done in lab 1, if possible this should be done when setting up the lab) -->
-    <!-- 2. Import required libraries -->
+    // TASK 1: Initialize and secure the map-- >
+    // TODO: Initialize the map and create a map style on the Cloud Console-- >
+    // Create a Map Style and corresponding ID to use here(done in lab 1, if possible this should be done when setting up the lab)-->
+    // Import required libraries-- >
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { Place, PlaceAutocompleteElement } = await google.maps.importLibrary("places");
-    <!-- 3. Initialize the Map -->
-    map = new Map(document.getElementById("map"), {
-        center: { lat: 45.523, lng: -122.676 }, // Default city view
-        zoom: 13,
-        mapId: "CIVIC_INSIGHT_MAP_ID" // This is necessary to enable Cloud Styling and use AdvancedMarkerElement
-    });
+    < !--3. Initialize the Map-- >
+        map = new Map(document.getElementById("map"), {
+            center: { lat: 45.523, lng: -122.676 }, // Default city view
+            zoom: 13,
+            // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
+            mapId: "INSERT_YOUR_MAP_ID_HERE"
+        });
     map.markersArray = [];
     infoWindow = new InfoWindow();
     // END TASK 1 BLOCK
 
-    <!-- TASK 2: Smart Autocomplete -->
-    <!-- TODO: Allow selection of addresses in the US with autocomplete -->
-    <!-- 1. Allow autocompletion on addresses in the text box -->
+    // TASK 2: Smart Autocomplete-- >
+    // TODO: Allow selection of addresses in the US with autocomplete-- >
+    // Allow autocompletion on addresses in the text box-- >
     const autocomplete = new PlaceAutocompleteElement({
         // Restrict results to a specific region (e.g., 'us')
         includedRegionCodes: ['us']
     });
     document.getElementById("autocomplete-container").appendChild(autocomplete);
 
-    <!-- 2. Selection of address displays details under the text box -->
+    // Selection of address displays details under the text box-- >
     autocomplete.addEventListener('gmp-select', async ({ placePrediction }) => {
         currentPlace = placePrediction.toPlace();
 
@@ -45,10 +46,10 @@ async function initLab() {
     document.getElementById("validate-btn").addEventListener("click", async () => {
         if (!currentPlace) return alert("Select an address first!");
 
-        <!-- TASK 3: Address validation -->
-        <!-- TODO: Validate the selected address -->
+        // TASK 3: Address validation-- >
+        // TODO: Validate the selected address-- >
 
-        <!-- 1. Call the Address Validation API -->
+        // Call the Address Validation API-- >
         // Narrative: Ensure this isn't a vacant lot or missing an apartment number.
         const { AddressValidation } = await google.maps.importLibrary("addressValidation");
 
@@ -61,7 +62,7 @@ async function initLab() {
 
         const result = await AddressValidation.fetchAddressValidation(request);
 
-        <!-- 2. Display validation results -->
+        // Display validation results-- >
         const validationInfo = [];
 
         if (result.verdict) {
@@ -113,7 +114,7 @@ async function initLab() {
         const center = map.getCenter();
         const request = {
             locationRestriction: {
-                center: {lat: center.lat(), lng: center.lng()},
+                center: { lat: center.lat(), lng: center.lng() },
                 radius: 5000
             },
             includedTypes: ['hospital', 'medical_clinic'],
@@ -121,7 +122,7 @@ async function initLab() {
             fields: ['displayName', 'location', 'businessStatus', 'regularOpeningHours']
         };
 
-        const {places} = await Place.searchNearby(request);
+        const { places } = await Place.searchNearby(request);
 
         if (places && places.length > 0) {
             await generateListAndMarkers(places);
@@ -147,7 +148,7 @@ async function initLab() {
         const request = {
             textQuery: "EV Charging Station",
             locationBias: {
-                center: {lat: center.lat(), lng: center.lng()},
+                center: { lat: center.lat(), lng: center.lng() },
                 radius: 5000
             },
             ...evOptions,
@@ -155,7 +156,7 @@ async function initLab() {
             fields: ['displayName', 'location', 'formattedAddress', 'evChargeOptions']
         };
 
-        const {places} = await Place.searchByText(request);
+        const { places } = await Place.searchByText(request);
 
         if (places && places.length > 0) {
             await generateListAndMarkers(places);
@@ -231,7 +232,7 @@ async function showPlaceDetails(place, marker) {
 
     if (marker) {
         // Highlight new marker (blue color and bring to front)
-        const {PinElement} = await google.maps.importLibrary("marker");
+        const { PinElement } = await google.maps.importLibrary("marker");
         const bluePinElement = new PinElement({
             background: "#4285F4",
             borderColor: "#1a73e8",
@@ -246,7 +247,7 @@ async function showPlaceDetails(place, marker) {
     // This part of the function is one of the concepts that needs to be covered in the lab.
     // Fetch additional fields for detailed information
 
-    <!-- TASK 8/9: AddressDescriptor and Accessibility -->
+    // TASK 8 / 9: AddressDescriptor and Accessibility-- >
     await place.fetchFields({
         fields: ['addressDescriptor', 'accessibilityOptions', 'displayName', 'formattedAddress']
     });

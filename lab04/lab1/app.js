@@ -5,15 +5,15 @@ async function initMap() {
 
     // TASK 2 & 3: Initialize the Map
     // TODO: Initialize map with a Map ID to enable Cloud Styling and the Vector Engine
-    
+
     // Request libraries when needed, not in the script tag.
     const { Map } = await google.maps.importLibrary("maps");
-    
+
     map = new Map(document.getElementById("map"), {
         center: cityHallCoords,
         zoom: 13,
-        /* TODO: Add your Map ID below */
-        mapId: "a95ae7bab0e27ee63548ae4a", 
+        // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
+        mapId: "INSERT_YOUR_MAP_ID_HERE"
     });
     // END TASK 2 & 3: Initialize the Map
 
@@ -43,11 +43,11 @@ async function initMap() {
         title: "City Hall (Legacy Marker)"
     });
     // END TASK 5: Basic Markers (Legacy)
-    
+
     // TASK 6: Advanced Markers (Modern)
     // TODO: Import Marker library and create an AdvancedMarkerElement
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-    
+
     const pin = new PinElement({ background: "#FBBC04" });
     const advMarker = new AdvancedMarkerElement({
         map,
@@ -56,7 +56,7 @@ async function initMap() {
         title: "Main Library (Advanced Marker)"
     });
     // END TASK 6: Advanced Markers (Modern)
-    
+
     // TASK 7: Data-Driven Styling (School Districts)
     // TODO: Use getFeatureLayer to style the 'SCHOOL_DISTRICT' layer
     const featureLayer = map.getFeatureLayer('SCHOOL_DISTRICT');
@@ -67,7 +67,7 @@ async function initMap() {
         featureLayer.style = (options) => {
             // Only show if the toggle is 'ON'
             if (!isVisible) {
-                return { };
+                return {};
             }
 
             if (options.feature.placeId === "ChIJTyCM6zGAhYARcobigWphLnM") {
@@ -85,10 +85,10 @@ async function initMap() {
     // 4. Update the map whenever the switch is toggled
     document.getElementById('school-toggle').addEventListener('change', applySchoolStyles);
     // END TASK 7: Data-Driven Styling (School Districts)
-    
+
     // TASK 8: GeoJSON Data Layer
     // TODO: Load the provided GeoJSON file and set dynamic styling
-    
+
     // 1. Load the data once
     map.data.loadGeoJson('flood_zones.geojson'); // https://data.sfgov.org/Energy-and-Environment/FEMA-FIRM-Flood-Hazards-Coastal-2021-Update/jyce-e25k/about_data
     // 2. Define the styling logic in a reusable way
@@ -102,7 +102,7 @@ async function initMap() {
             }
 
             // Determine color based on the 'risk_level' property in the GeoJSON
-            const risk = feature.getProperty('fld_zone'); 
+            const risk = feature.getProperty('fld_zone');
             let color = 'gray'; // Default
 
             if (risk === 'AE' || risk === 'AO' || risk === 'VE') {
@@ -129,7 +129,7 @@ async function initMap() {
     // END TASK 8: GeoJSON Data Layer
 
     const resetBtn = document.getElementById("reset-btn");
-    
+
     // TASK 9: Custom Controls
     // TODO: Push the 'Reset' button into the map's TOP_LEFT control position
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(resetBtn);
@@ -158,13 +158,13 @@ async function initMap() {
     panoBtn.addEventListener("click", () => {
         const panoDiv = document.getElementById("pano");
         const mapDiv = document.getElementById("map");
-    
+
         if (panoDiv.style.display === "none" || panoDiv.style.display === "") {
             // Show it
             mapDiv.style.height = "70vh";
             panoDiv.style.height = "30vh";
             panoDiv.style.display = "block";
-            
+
         } else {
             // Hide it
             mapDiv.style.height = "100vh";

@@ -26,7 +26,8 @@ async function initMap() {
     map = new Map(document.getElementById("map"), {
         center: centerSanFranciscoCoords,
         zoom: 13,
-        mapId: "CIVIC_THEME_ID" // Highlight public buildings (REQUIRED for Advanced Markers)
+        // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
+        mapId: "INSERT_YOUR_MAP_ID_HERE"
     })
     // END TASK 2. Initialize the Map
 
@@ -82,26 +83,26 @@ async function dispatchServiceCallResponse() {
     const fields = ['durationMillis', 'distanceMeters', 'path', 'viewport'];
 
     routesService.computeRoutes({ ...request, fields: fields })
-    .then((response) => {
-        const route = response.routes[0]; // The response contains an array of routes
+        .then((response) => {
+            const route = response.routes[0]; // The response contains an array of routes
 
-        // Create polylines from the route data
-        // This handles both basic paths and traffic-aware paths automatically
-        activePolylines = route.createPolylines();
+            // Create polylines from the route data
+            // This handles both basic paths and traffic-aware paths automatically
+            activePolylines = route.createPolylines();
 
-        // Set each polyline on the map
-        activePolylines.forEach(polyline => {
-            polyline.setMap(map);
-        });
+            // Set each polyline on the map
+            activePolylines.forEach(polyline => {
+                polyline.setMap(map);
+            });
 
-        // Zoom the map to fit the entire route
-        if (route.viewport) {
-            map.fitBounds(route.viewport);
-        }
+            // Zoom the map to fit the entire route
+            if (route.viewport) {
+                map.fitBounds(route.viewport);
+            }
 
-        logEntry(`Route rendered. Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
-    })
-    .catch((e) => logEntry("Routes Request failed: " + e.message));
+            logEntry(`Route rendered. Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
+        })
+        .catch((e) => logEntry("Routes Request failed: " + e.message));
     // END TASK 4. Send a request to get traffic aware routing between two points
 }
 
@@ -134,73 +135,73 @@ async function optimizeHealthClinic() {
     };
 
     // Define the field mask (using JS SDK property names)
-    const fields = [ 'optimizedIntermediateWaypointIndices', 'path', 'distanceMeters', 'viewport' ];
+    const fields = ['optimizedIntermediateWaypointIndices', 'path', 'distanceMeters', 'viewport'];
 
     // Call the Routes Service
     routesService.computeRoutes({ ...request, fields })
-    .then((response) => {
-        const route = response.routes[0];
+        .then((response) => {
+            const route = response.routes[0];
 
-        // Render the optimized route on the map
-        activePolylines = route.createPolylines();
-        activePolylines.forEach(polyline => {
-            polyline.setOptions({
-                icons: [{
-                    icon: { 
-                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                        fillColor: '#FFFFFF',
-                        fillOpacity: 1,
-                        strokeColor: '#000000',
-                        strokeWeight: 1,
-                        scale: 3
-                    },
-                    offset: '0',
-                    repeat: '50px'
-                }]
+            // Render the optimized route on the map
+            activePolylines = route.createPolylines();
+            activePolylines.forEach(polyline => {
+                polyline.setOptions({
+                    icons: [{
+                        icon: {
+                            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                            fillColor: '#FFFFFF',
+                            fillOpacity: 1,
+                            strokeColor: '#000000',
+                            strokeWeight: 1,
+                            scale: 3
+                        },
+                        offset: '0',
+                        repeat: '50px'
+                    }]
+                });
+                polyline.setMap(map);
             });
-            polyline.setMap(map);
-        });
 
-        // Zoom the map to fit the entire route
-        if (route.viewport) {
-            map.fitBounds(route.viewport);
-        }
+            // Zoom the map to fit the entire route
+            if (route.viewport) {
+                map.fitBounds(route.viewport);
+            }
 
-        // Log the results
-        const order = route.optimizedIntermediateWaypointIndices;
+            // Log the results
+            const order = route.optimizedIntermediateWaypointIndices;
 
-        // Mark the waypoints clearly
-        const { PinElement } = google.maps.marker;
-        
-        // Ensure destination markers have default pins if they don't have them yet (initial drop)
-        // or we just overwrite them below.
-        
-        // 1. Update the Origin marker
-        const originPin = new PinElement({
-            background: "#4285F4", // Keep blue for origin
-            borderColor: "#174ea6",
-            glyphText: "O",
-            glyphColor: "white",
-        });
-        origin.content = originPin;
+            // Mark the waypoints clearly
+            const { PinElement } = google.maps.marker;
 
-        // 2. Update each waypoint with its sequence number (1-based index)
-        // 'order' contains the indices of 'destinations' in the optimized order.
-        order.forEach((destinationIndex, sequenceIndex) => {
-            const marker = destinations[destinationIndex];
-            const pin = new PinElement({
-                glyphText: (sequenceIndex + 1).toString(),
+            // Ensure destination markers have default pins if they don't have them yet (initial drop)
+            // or we just overwrite them below.
+
+            // 1. Update the Origin marker
+            const originPin = new PinElement({
+                background: "#4285F4", // Keep blue for origin
+                borderColor: "#174ea6",
+                glyphText: "O",
                 glyphColor: "white",
             });
-            marker.content = pin;
-        });
+            origin.content = originPin;
 
-        logEntry(`Clinic Itinerary Optimized. Waypoint Order: ${JSON.stringify(order)}`);
-        logEntry(`Total Optimized Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
-    })
-    .catch((e) => {
-        logEntry("Optimization failed: " + e.message);
-    });
+            // 2. Update each waypoint with its sequence number (1-based index)
+            // 'order' contains the indices of 'destinations' in the optimized order.
+            order.forEach((destinationIndex, sequenceIndex) => {
+                const marker = destinations[destinationIndex];
+                const pin = new PinElement({
+                    glyphText: (sequenceIndex + 1).toString(),
+                    glyphColor: "white",
+                });
+                marker.content = pin;
+            });
+
+            logEntry(`Clinic Itinerary Optimized. Waypoint Order: ${JSON.stringify(order)}`);
+            logEntry(`Total Optimized Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
+        })
+        .catch((e) => {
+            logEntry("Optimization failed: " + e.message);
+        });
     // END TASK 5. Send a request to get an optimized route along several waypoints
 }
 
@@ -233,30 +234,30 @@ async function precisionParatransit() {
     };
 
     // Define the field mask (using JS SDK property names)
-    const fields = [ 'path', 'distanceMeters', 'viewport' ];
+    const fields = ['path', 'distanceMeters', 'viewport'];
 
     // Call the Routes Service
     routesService.computeRoutes({ ...request, fields })
-    .then((response) => {
-        const route = response.routes[0];
+        .then((response) => {
+            const route = response.routes[0];
 
-        // Render the optimized route on the map
-        activePolylines = route.createPolylines();
-        activePolylines.forEach(polyline => polyline.setMap(map));
+            // Render the optimized route on the map
+            activePolylines = route.createPolylines();
+            activePolylines.forEach(polyline => polyline.setMap(map));
 
-        // Zoom the map to fit the entire route
-        if (route.viewport) {
-            map.fitBounds(route.viewport);
-        }
+            // Zoom the map to fit the entire route
+            if (route.viewport) {
+                map.fitBounds(route.viewport);
+            }
 
-        // Log the results
-        const order = route.optimizedIntermediateWaypointIndices;
-        logEntry("Precision safety arrival set.");
-        logEntry(`Total Optimized Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
-    })
-    .catch((e) => {
-        logEntry("Optimization failed: " + e.message);
-    });
+            // Log the results
+            const order = route.optimizedIntermediateWaypointIndices;
+            logEntry("Precision safety arrival set.");
+            logEntry(`Total Optimized Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
+        })
+        .catch((e) => {
+            logEntry("Optimization failed: " + e.message);
+        });
     // END TASK 6. Send a request to get an optimized routes along several waypoints
 }
 
@@ -299,31 +300,31 @@ async function analyzeEnvironmentalImpact() {
 
     // Call computeRoutes using the Promise pattern
     routesService.computeRoutes({ ...request, fields })
-    .then((response) => {
-        const route = response.routes[0];
+        .then((response) => {
+            const route = response.routes[0];
 
-        // Render the route on the map
-        activePolylines = route.createPolylines();
-        activePolylines.forEach(polyline => polyline.setMap(map));
+            // Render the route on the map
+            activePolylines = route.createPolylines();
+            activePolylines.forEach(polyline => polyline.setMap(map));
 
-        // Zoom to fit the route
-        if (route.viewport) {
-            map.fitBounds(route.viewport);
-        }
+            // Zoom to fit the route
+            if (route.viewport) {
+                map.fitBounds(route.viewport);
+            }
 
-        // Extract and log the sustainability data
-        // Access results via the top-level properties
-        const fuel = (route.travelAdvisory?.fuelConsumptionMicroliters || 0) / 1000000; // Convert to liters
-        const tolls = route.travelAdvisory?.tollInfo;
+            // Extract and log the sustainability data
+            // Access results via the top-level properties
+            const fuel = (route.travelAdvisory?.fuelConsumptionMicroliters || 0) / 1000000; // Convert to liters
+            const tolls = route.travelAdvisory?.tollInfo;
 
-        logEntry(`Sustainability Report:`);
-        logEntry(`- Estimated Fuel: ${fuel.toFixed(2)}L (Diesel)`);
-        logEntry(`- Toll Data: ${tolls ? "Tolls present on route" : "No tolls detected"}`);
-        logEntry(`- Total Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
-    })
-    .catch((e) => {
-        logEntry("Sustainability Analysis failed: " + e.message);
-    });
+            logEntry(`Sustainability Report:`);
+            logEntry(`- Estimated Fuel: ${fuel.toFixed(2)}L (Diesel)`);
+            logEntry(`- Toll Data: ${tolls ? "Tolls present on route" : "No tolls detected"}`);
+            logEntry(`- Total Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
+        })
+        .catch((e) => {
+            logEntry("Sustainability Analysis failed: " + e.message);
+        });
     // END TASK 7. Send a request to calculate fuel consumption and toll costs
 }
 
@@ -344,42 +345,42 @@ async function assessNeighborhoodEquity() {
 
     // START TASK 8. Send a request to get a matrix of routes between given origins and destinations
     const request = {
-        origins: [ originTransportAgencyCoords, originGeneralHospitalCoords ],
+        origins: [originTransportAgencyCoords, originGeneralHospitalCoords],
         destinations: destinations.map(m => m.position),
         travelMode: 'DRIVING'
     };
 
     // Define the field mask (using JS SDK property names)
-    const fields = [ 'durationMillis', 'distanceMeters', 'condition' ];
+    const fields = ['durationMillis', 'distanceMeters', 'condition'];
 
     // Call the Routes Service
     matrixService.computeRouteMatrix({ ...request, fields })
-    .then((response) => {
-        logEntry("<b>Neighborhood Equity Assessment Results:</b>");
-        
-        const originNames = [ originTransportAgencyName, originGeneralHospitalName ];
+        .then((response) => {
+            logEntry("<b>Neighborhood Equity Assessment Results:</b>");
 
-        response.matrix.rows.forEach((row, originIndex) => {
-            logEntry(`<u>From ${originNames[originIndex]}:</u>`);
-            row.items.forEach((item, destinationIndex) => {
-                const condition = item.condition;
-                // Check both condition AND status
-                // status.code === 0 (or undefined in some cases) means OK
-                const isRouteValid = item.condition === 'ROUTE_EXISTS' && (!item.status || item.status.code === 0);
+            const originNames = [originTransportAgencyName, originGeneralHospitalName];
 
-                if (isRouteValid) {
-                    const distanceKm = (item.distanceMeters / 1000).toFixed(2);
-                    const durationMins = Math.round(item.durationMillis / 60000);
-                    logEntry(`- Destination ${destinationIndex + 1}: ${condition} (${distanceKm} km, ${durationMins} mins)`);
-                } else {
-                    logEntry(`- Destination ${destinationIndex + 1}: <span style="color: red;">No route found</span>`);
-                }
-            });
+            response.matrix.rows.forEach((row, originIndex) => {
+                logEntry(`<u>From ${originNames[originIndex]}:</u>`);
+                row.items.forEach((item, destinationIndex) => {
+                    const condition = item.condition;
+                    // Check both condition AND status
+                    // status.code === 0 (or undefined in some cases) means OK
+                    const isRouteValid = item.condition === 'ROUTE_EXISTS' && (!item.status || item.status.code === 0);
+
+                    if (isRouteValid) {
+                        const distanceKm = (item.distanceMeters / 1000).toFixed(2);
+                        const durationMins = Math.round(item.durationMillis / 60000);
+                        logEntry(`- Destination ${destinationIndex + 1}: ${condition} (${distanceKm} km, ${durationMins} mins)`);
+                    } else {
+                        logEntry(`- Destination ${destinationIndex + 1}: <span style="color: red;">No route found</span>`);
+                    }
+                });
+            })
         })
-    })
-    .catch((e) => {
-        logEntry("Neighborhood equity assessment failed: " + e.message);
-    });
+        .catch((e) => {
+            logEntry("Neighborhood equity assessment failed: " + e.message);
+        });
     // END TASK 8. Send a request to get a matrix of routes between given origins and destinations
 }
 
@@ -442,31 +443,31 @@ async function modelPeakInfrastructure() {
     };
 
     // Define the field mask (using JS SDK property names)
-    const fields = [ 'path', 'distanceMeters', 'viewport', 'durationMillis' ];
+    const fields = ['path', 'distanceMeters', 'viewport', 'durationMillis'];
 
     routesService.computeRoutes({ ...request, fields })
-    .then((response) => {
-        const route = response.routes[0];
+        .then((response) => {
+            const route = response.routes[0];
 
-        // 1. Render the route on the map
-        activePolylines = route.createPolylines();
-        activePolylines.forEach(polyline => polyline.setMap(map));
+            // 1. Render the route on the map
+            activePolylines = route.createPolylines();
+            activePolylines.forEach(polyline => polyline.setMap(map));
 
-        // 2. Zoom to fit the route
-        if (route.viewport) {
-            map.fitBounds(route.viewport);
-        }
+            // 2. Zoom to fit the route
+            if (route.viewport) {
+                map.fitBounds(route.viewport);
+            }
 
-        // 3. Log useful information
-        const durationMins = Math.round(route.durationMillis / 60000);
-        logEntry(`Predictive Congestion Modeling Active:`);
-        logEntry(`- Projected Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
-        logEntry(`- Projected Peak Duration: ${durationMins} mins`);
-        logEntry(`- Modeling Departure: ${timeValue} ${dayLabel} (Local Time)`);
-    })
-    .catch((e) => {
-        logEntry("Peak modeling failed: " + e.message);
-    });
+            // 3. Log useful information
+            const durationMins = Math.round(route.durationMillis / 60000);
+            logEntry(`Predictive Congestion Modeling Active:`);
+            logEntry(`- Projected Distance: ${(route.distanceMeters / 1000).toFixed(2)} km`);
+            logEntry(`- Projected Peak Duration: ${durationMins} mins`);
+            logEntry(`- Modeling Departure: ${timeValue} ${dayLabel} (Local Time)`);
+        })
+        .catch((e) => {
+            logEntry("Peak modeling failed: " + e.message);
+        });
     // END TASK 9. Send a request to calculate route time based on time of day
 }
 
