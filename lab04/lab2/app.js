@@ -2,33 +2,25 @@ let map, infoWindow, currentPlace, currentlySelectedMarker;
 
 async function initLab() {
 
-    // TASK 1: Initialize and secure the map-- >
-    // TODO: Initialize the map and create a map style on the Cloud Console-- >
-    // Create a Map Style and corresponding ID to use here(done in lab 1, if possible this should be done when setting up the lab)-->
-    // Import required libraries-- >
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { Place, PlaceAutocompleteElement } = await google.maps.importLibrary("places");
-    < !--3. Initialize the Map-- >
-        map = new Map(document.getElementById("map"), {
-            center: { lat: 45.523, lng: -122.676 }, // Default city view
-            zoom: 13,
-            // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
-            mapId: "INSERT_YOUR_MAP_ID_HERE"
-        });
+    map = new Map(document.getElementById("map"), {
+        center: { lat: 45.523, lng: -122.676 }, // Default city view
+        zoom: 13,
+        // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
+        mapId: "INSERT_YOUR_MAP_ID_HERE"
+    });
     map.markersArray = [];
     infoWindow = new InfoWindow();
-    // END TASK 1 BLOCK
 
-    // TASK 2: Smart Autocomplete-- >
-    // TODO: Allow selection of addresses in the US with autocomplete-- >
-    // Allow autocompletion on addresses in the text box-- >
+
     const autocomplete = new PlaceAutocompleteElement({
         // Restrict results to a specific region (e.g., 'us')
         includedRegionCodes: ['us']
     });
     document.getElementById("autocomplete-container").appendChild(autocomplete);
 
-    // Selection of address displays details under the text box-- >
+
     autocomplete.addEventListener('gmp-select', async ({ placePrediction }) => {
         currentPlace = placePrediction.toPlace();
 
@@ -41,16 +33,11 @@ async function initLab() {
         document.getElementById("place-address").textContent = currentPlace.formattedAddress;
         document.getElementById("selected-place-details").classList.remove("d-none");
     });
-    // END TASK 2 BLOCK
+
 
     document.getElementById("validate-btn").addEventListener("click", async () => {
         if (!currentPlace) return alert("Select an address first!");
 
-        // TASK 3: Address validation-- >
-        // TODO: Validate the selected address-- >
-
-        // Call the Address Validation API-- >
-        // Narrative: Ensure this isn't a vacant lot or missing an apartment number.
         const { AddressValidation } = await google.maps.importLibrary("addressValidation");
 
         const request = {
@@ -62,7 +49,7 @@ async function initLab() {
 
         const result = await AddressValidation.fetchAddressValidation(request);
 
-        // Display validation results-- >
+
         const validationInfo = [];
 
         if (result.verdict) {
@@ -81,13 +68,13 @@ async function initLab() {
 
         alert(validationInfo.join('\n'));
         console.log("Validating:", currentPlace.id);
-        // END TASK 3 BLOCK
+
 
     });
 
     document.getElementById("locate-me").addEventListener("click", () => {
 
-        // --- TASK 4: GEOLOCATION ---
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const pos = {
@@ -97,19 +84,11 @@ async function initLab() {
                 map.setCenter(pos);
             });
         }
-        // END TASK 4 BLOCK
+
 
     });
 
     document.getElementById("find-clinics").addEventListener("click", async () => {
-
-        // --- TASK 5: NEARBY SEARCH (Health Clinics) ---
-        // TODO this part of the lab also needs to add the functions to generate markers for health clinics and EV charging stations
-        // Ask the user to add them after the HELPER FUNCTIONS FROM HERE marker
-        // - generateListAndMarkers
-        // - clearAllMarkers
-        // - displayResults
-        // - showPlaceDetails
 
         const center = map.getCenter();
         const request = {
@@ -129,13 +108,11 @@ async function initLab() {
         } else {
             alert("No health clinics found nearby.");
         }
-        // END TASK 5 BLOCK
 
     });
 
     document.getElementById("find-ev").addEventListener("click", async () => {
 
-        // --- TASK 6: TEXT SEARCH (EV Charging) ---
         const { Place } = await google.maps.importLibrary("places");
 
         const center = map.getCenter();
@@ -164,7 +141,6 @@ async function initLab() {
             alert("No EV charging stations found nearby.");
         }
     });
-    // END TASK 6 BLOCK
 
 }
 
@@ -243,11 +219,6 @@ async function showPlaceDetails(place, marker) {
         currentlySelectedMarker = marker;
     }
 
-    // TODO: Tasks 8/9 - show details with AddressDescriptor and Accessibility
-    // This part of the function is one of the concepts that needs to be covered in the lab.
-    // Fetch additional fields for detailed information
-
-    // TASK 8 / 9: AddressDescriptor and Accessibility-- >
     await place.fetchFields({
         fields: ['addressDescriptor', 'accessibilityOptions', 'displayName', 'formattedAddress']
     });
@@ -279,7 +250,6 @@ async function showPlaceDetails(place, marker) {
     infoWindow.setContent(content);
     // Open using the marker as anchor to ensure proper positioning above the marker
     infoWindow.open(map, marker);
-    // END TASKS 8/9 BLOCK
 
     // Ensure the marker is reset when the infoWindow is closed
     google.maps.event.addListenerOnce(infoWindow, 'closeclick', () => {
@@ -302,7 +272,7 @@ function showLab(labId) {
         case 'lab4':
             if (labId === 'lab4') {
                 window.location.href = '/index.html';
-            } else if (labId !== 'lab2') {
+            } else {
                 window.location.href = `/${labId}/index.html`;
             }
             break;
@@ -310,3 +280,56 @@ function showLab(labId) {
             window.alert("Invalid lab ID");
     }
 }
+
+const btn2 = document.querySelector(`.${prefix}-add-waypoint-btn`);
+if (btn2) {
+    btn2.onclick = async (e) => {
+        const { PinElement } = await google.maps.importLibrary("marker");
+        marker.content = new PinElement({
+            background: "#00ACC1",
+            borderColor: "#006064",
+            glyphText: (stopovers.length + 1).toString(),
+            glyphColor: "white",
+        });
+        stopovers.push(marker);
+    };
+}
+
+const btn3 = document.querySelector(`.${prefix}-add-end-btn`);
+if (btn3) {
+    btn3.onclick = async (e) => {
+        const { PinElement } = await google.maps.importLibrary("marker");
+        marker.content = new PinElement({
+            background: "#EA4335",
+            borderColor: "#B31412",
+            glyphText: (destinations.length + 1).toString(),
+            glyphColor: "white",
+        });
+        destinations.push(marker);
+    };
+}
+
+function formatPostalAddressDetails(postalAddress) {
+    if (!postalAddress) {
+        return `<h5 class="mb-1 text-primary">Address unavailable</h5>`;
+    }
+
+    const streetAddress = (postalAddress.addressLines || []).join("<br>");
+    const cityStateZip = [
+        postalAddress.postalCode,
+        postalAddress.locality,
+        postalAddress.administrativeArea
+    ].filter(Boolean).join(", ");
+
+    return `
+        <h5 class="mb-1 text-primary">Validated Address</h5>
+        <p class="mb-1"><strong>Street:</strong><br>${streetAddress || "Not available"}</p>
+        <p class="mb-1"><strong>ZIP/City/State:</strong><br>${cityStateZip || "Not available"}</p>
+        <p class="mb-0"><strong>Country:</strong><br>${postalAddress.regionCode || "Not available"}</p>
+    `;
+}
+
+// Global script bootstrap execution entrypoint
+initMap();
+
+

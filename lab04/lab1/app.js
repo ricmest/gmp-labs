@@ -187,11 +187,65 @@ function showLab(labId) {
         case 'lab4':
             if (labId === 'lab4') {
                 window.location.href = '/index.html';
-            } else if (labId !== 'lab1') {
+            } else {
                 window.location.href = `/${labId}/index.html`;
             }
             break;
         default:
             window.alert("Invalid lab ID");
     }
+
+
+    const btn2 = document.querySelector(`.${prefix}-add-waypoint-btn`);
+    if (btn2) {
+        btn2.onclick = async (e) => {
+            const { PinElement } = await google.maps.importLibrary("marker");
+            marker.content = new PinElement({
+                background: "#00ACC1",
+                borderColor: "#006064",
+                glyphText: (stopovers.length + 1).toString(),
+                glyphColor: "white",
+            });
+            stopovers.push(marker);
+        };
+    }
+
+    const btn3 = document.querySelector(`.${prefix}-add-end-btn`);
+    if (btn3) {
+        btn3.onclick = async (e) => {
+            const { PinElement } = await google.maps.importLibrary("marker");
+            marker.content = new PinElement({
+                background: "#EA4335",
+                borderColor: "#B31412",
+                glyphText: (destinations.length + 1).toString(),
+                glyphColor: "white",
+            });
+            destinations.push(marker);
+        };
+    }
 }
+
+function formatPostalAddressDetails(postalAddress) {
+    if (!postalAddress) {
+        return `<h5 class="mb-1 text-primary">Address unavailable</h5>`;
+    }
+
+    const streetAddress = (postalAddress.addressLines || []).join("<br>");
+    const cityStateZip = [
+        postalAddress.postalCode,
+        postalAddress.locality,
+        postalAddress.administrativeArea
+    ].filter(Boolean).join(", ");
+
+    return `
+        <h5 class="mb-1 text-primary">Validated Address</h5>
+        <p class="mb-1"><strong>Street:</strong><br>${streetAddress || "Not available"}</p>
+        <p class="mb-1"><strong>ZIP/City/State:</strong><br>${cityStateZip || "Not available"}</p>
+        <p class="mb-0"><strong>Country:</strong><br>${postalAddress.regionCode || "Not available"}</p>
+    `;
+}
+
+// Global script bootstrap execution entrypoint
+initMap();
+
+
