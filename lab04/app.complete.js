@@ -27,9 +27,9 @@ const districtColors = {
 
 /**
  * ============================================================================
- * MODULE 2: INITIALIZATION, WEB COMPONENTS & DATA LAYERS
+ * CHALLENGE 1 - INITIALIZATION, WEB COMPONENTS & DATA LAYERS
  * ============================================================================
- */
+*/
 async function initMap() {
 
     // START_STUDENT_TODO: TASK 1 - Dynamic Library Imports
@@ -44,7 +44,8 @@ async function initMap() {
     map = new Map(document.getElementById("map"), {
         center: { lat: 37.7749, lng: -122.4194 },
         zoom: 12,
-        mapId: "CIVIC_THEME_ID"
+        // TODO: Replace "INSERT_YOUR_MAP_ID_HERE" with the "MAP ID" you just created.
+        mapId: "INSERT_YOUR_MAP_ID_HERE"
     });
     // END_STUDENT_TODO: TASK 2
 
@@ -83,7 +84,7 @@ async function initMap() {
 
 /**
  * ============================================================================
- * MODULE 3: INTELLIGENT DISCOVERY & PLACES AUTOCOMPLETE
+ * CHALLENGE 2 - INTELLIGENT DISCOVERY & PLACES AUTOCOMPLETE
  * ============================================================================
  */
 async function initAutocompletePipeline() {
@@ -243,7 +244,7 @@ function initRouteMatrixPipeline() {
             travelMode: 'DRIVING'
         };
 
-        const fields = [ 'durationMillis', 'distanceMeters', 'condition' ];
+        const fields = ['durationMillis', 'distanceMeters', 'condition'];
 
         RouteMatrix.computeRouteMatrix({ ...request, fields })
             .then((response) => {
@@ -308,9 +309,9 @@ initRouteMatrixPipeline();
 
 /**
  * ============================================================================
- * MODULE 5: SINGLE VEHICLE DISPATCH, ECO-ROUTING & TURN-BY-TURN
+ * CHALLENGE 4 - SINGLE VEHICLE DISPATCH, ECO-ROUTING & TURN-BY-TURN
  * ============================================================================
- */
+*/
 function initRoutesV2Pipeline() {
     document.getElementById("optimize-btn").addEventListener("click", async () => {
         console.log("Dispatching Fleet via Routes API...");
@@ -326,6 +327,7 @@ function initRoutesV2Pipeline() {
             // 2. Implement the 'Route.computeRoutes' logic, factoring in destination arrays and dynamic travel settings.
             // 3. Add eco-routing options and intermediate waypoints dynamically to your payload configuration arrays.
             // 4. Call route.createPolylines() on the response object to overlay the encoded paths on the map context.
+            // HINT:  const { Route } = ...
             const { Route } = await google.maps.importLibrary('routes');
 
             activePolylines.forEach(p => p.setMap(null));
@@ -347,33 +349,34 @@ function initRoutesV2Pipeline() {
             }
 
             Route.computeRoutes({ ...request, fields })
-            .then((response) => {
-                const route = response.routes[0];
+                .then((response) => {
+                    const route = response.routes[0];
 
-                activePolylines = route.createPolylines();
-                activePolylines.forEach(polyline => {
-                    polyline.setOptions({
-                        icons: [{
-                            icon: {
-                                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                                fillColor: '#FFFFFF',
-                                fillOpacity: 1,
-                                strokeColor: '#000000',
-                                strokeWeight: 1,
-                                scale: 3
-                            },
-                            offset: '0',
-                            repeat: '50px'
-                        }]
+                    activePolylines = route.createPolylines();
+                    activePolylines.forEach(polyline => {
+                        polyline.setOptions({
+                            icons: [{
+                                icon: {
+                                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                                    fillColor: '#FFFFFF',
+                                    fillOpacity: 1,
+                                    strokeColor: '#000000',
+                                    strokeWeight: 1,
+                                    scale: 3
+                                },
+                                offset: '0',
+                                repeat: '50px'
+                            }]
+                        });
+                        polyline.setMap(map);
                     });
-                    polyline.setMap(map);
-                });
 
-                if (route.viewport) {
-                    map.fitBounds(route.viewport);
-                }
-            });
+                    if (route.viewport) {
+                        map.fitBounds(route.viewport);
+                    }
+                });
             // END_STUDENT_TODO: TASK 9
+
         } catch (error) {
             console.error("Route API error:", error);
             alert("Unable to optimize route.");
@@ -384,7 +387,7 @@ initRoutesV2Pipeline();
 
 /**
  * ============================================================================
- * MODULE 6: COMPREHENSIVE LOCALIZED SPATIAL DISCOVERY (NEARBY PLACES SEARCH)
+ * CHALLENGE 5 - COMPREHENSIVE LOCALIZED SPATIAL DISCOVERY (NEARBY PLACES SEARCH)
  * ============================================================================
  */
 async function findNearbyFacilities(lat, lng, types) {
@@ -465,7 +468,7 @@ async function findNearbyFacilities(lat, lng, types) {
 
 /**
  * ============================================================================
- * UTILITY PIPELINES, LAYOUT OVERLAYS & STRUCTURAL INTEGRATION PARSERS
+ * CHALLENGE 6 - PIPELINES, LAYOUT OVERLAYS & STRUCTURAL INTEGRATION PARSERS
  * ============================================================================
  */
 function toggleCurrentWorks() {
@@ -642,7 +645,7 @@ async function renderCurrentWorks() {
                     `;
                     document.getElementById('address-descriptor').innerHTML = content;
 
-                    addNearbyButtonListeners([ 'transit_depot' ]);
+                    addNearbyButtonListeners(['transit_depot']);
                     addNavigationButtonsListeners('works', marker);
                 });
 
