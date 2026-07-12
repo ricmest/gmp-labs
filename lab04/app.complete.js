@@ -27,34 +27,47 @@ const districtColors = {
 
 /**
  * ============================================================================
- * CHALLENGE 1 - INITIALIZATION, WEB COMPONENTS & DATA LAYERS
+ * MODULE 2: INITIALIZATION, WEB COMPONENTS & DATA LAYERS
  * ============================================================================
-*/
+ */
 async function initMap() {
 
     // START_STUDENT_TODO: TASK 1 - Dynamic Library Imports
     // Import the 'maps' library to construct the map instance.
-
+    const { Map } = await google.maps.importLibrary("maps");
     // END_STUDENT_TODO: TASK 1
 
     // START_STUDENT_TODO: TASK 2 - Map Instantiation
     // Initialize the Map instance targeted at the DOM element with ID "map".
     // Configure it centered at San Francisco (37.7749, -122.4194), zoom 12,
     // and bind your Cloud-based Custom Map ID (mapId) to enable Advanced Markers.
-
+    map = new Map(document.getElementById("map"), {
+        center: { lat: 37.7749, lng: -122.4194 },
+        zoom: 12,
+        mapId: "CIVIC_THEME_ID"
+    });
     // END_STUDENT_TODO: TASK 2
 
     infoWindow = new google.maps.InfoWindow();
 
     // START_STUDENT_TODO: TASK 3 - Data Layer GeoJSON Ingestion
     // Load the local vector layer 'maintenance_districts.geojson' into the map's Data Layer.
-
+    map.data.loadGeoJson('maintenance_districts.geojson');
     // END_STUDENT_TODO: TASK 3
 
     // START_STUDENT_TODO: TASK 4 - Data Layer Interactive Event Mapping
     // Add a click listener to the map's Data Layer to handle district feature interaction.
     // Extract 'sup_name' and 'sup_dist_name' from the clicked feature properties to populate the UI element.
+    map.data.addListener('click', (event) => {
+        const name = event.feature.getProperty('sup_name');
+        const dist = event.feature.getProperty('sup_dist_name');
 
+        document.getElementById('address-descriptor').innerHTML =
+            `<div class="district-details">
+                <h5 class="text-primary mb-1">${dist}</h5>
+                <p class="mb-0"><strong>Supervisor:</strong> ${name}</p>
+            </div>`;
+    });
     // END_STUDENT_TODO: TASK 4
 
     // Establish initial core DOM listeners
@@ -70,14 +83,17 @@ async function initMap() {
 
 /**
  * ============================================================================
- * CHALLENGE 2 - INTELLIGENT DISCOVERY & PLACES AUTOCOMPLETE
+ * MODULE 3: INTELLIGENT DISCOVERY & PLACES AUTOCOMPLETE
  * ============================================================================
  */
 async function initAutocompletePipeline() {
     // START_STUDENT_TODO: TASK 5 - Places (New) Web Component Setup
     // Import the 'places' library and instantiate the next-gen 'PlaceAutocompleteElement'.
     // Bind its location bias contextually to the current map center view.
-
+    const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+    const autocomplete = new PlaceAutocompleteElement({
+        locationBias: map.getCenter(),
+    });
     // END_STUDENT_TODO: TASK 5
 
     // Inject the Autocomplete Web Component inside the standard layout panel container
@@ -88,7 +104,13 @@ async function initAutocompletePipeline() {
     // START_STUDENT_TODO: TASK 6 - Autocomplete Event Processing
     // Add a 'gmp-select' listener to the Autocomplete element.
     // Use place.fetchFields to request the 'displayName', 'location', and 'formattedAddress' fields.
+    autocomplete.addEventListener("gmp-select", async (event) => {
+        const place = event.place;
+        if (!place || !place.id) return;
 
+        await place.fetchFields({ fields: ["displayName", "location", "formattedAddress"] });
+        plotPlace(place);
+    });
     // END_STUDENT_TODO: TASK 6
 
     // Handle UI layout plotting for autocomplete selections
@@ -129,7 +151,61 @@ async function initAutocompletePipeline() {
             // 2. Formulate and submit an address validation request using 'AddressValidation.fetchAddressValidation'.
             // 3. Construct a custom 'PinElement' instance to style the resulting verified asset geocode.
             // 4. Instantiate an 'AdvancedMarkerElement' to render the output position onto the active map view.
+            const { AddressValidation } = await google.maps.importLibrary("addressValidation");
+            const { PinElement, AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
+            const request = {
+                address: {
+                    regionCode: "US",
+                    addressLines: [userInput]
+                }
+            };
+
+            const response = await AddressValidation.fetchAddressValidation(request);
+
+            if (response && response.geocode) {
+                const { location } = response.geocode;
+                const formattedAddress = response.address.formattedAddress;
+
+                const munsIcon = new PinElement({
+                    glyphText: "⌂",
+                    background: "#C2185B",
+                    borderColor: "#880E4F",
+                    glyphColor: "white"
+                });
+
+                if (addressMarker) addressMarker.setMap(null);
+
+                addressMarker = new AdvancedMarkerElement({
+                    map: map,
+                    position: location,
+                    content: munsIcon,
+                    title: formattedAddress
+                });
+
+                // Attach dynamic contextual operational panel dispatch configuration triggers
+                addressMarker.addListener("click", async () => {
+                    const content = `
+                        <div class="site-details">
+                            <h5 class="mb-1 text-primary">${formatPostalAddressDetails(response.address.postalAddress)}</h5>
+                            ${getNearbyButtonHtml(location)}
+                            ${getNavigationButtonsHtml('address')}                        
+                        </div>
+                    `;
+                    document.getElementById('address-descriptor').innerHTML = content;
+
+                    addNearbyButtonListeners(["government_office", "local_government_office"]);
+                    addNavigationButtonsListeners('address', addressMarker);
+                });
+
+                map.setCenter(addressMarker.position);
+                map.setZoom(16);
+                document.getElementById('validation-output').innerHTML =
+                    `<div class="alert alert-success mt-2">Validated: ${formattedAddress}</div>`;
+            } else {
+                document.getElementById('validation-output').innerHTML =
+                    `<div class="alert alert-danger mt-2">Validation failed. Please check the address.</div>`;
+            }
             // END_STUDENT_TODO: TASK 7
 
         } catch (error) {
@@ -142,7 +218,7 @@ async function initAutocompletePipeline() {
 
 /**
  * ============================================================================
- * CHALLENGE 3 -  MANY-TO-MANY ANALYSIS & NEIGHBORHOOD EQUITY MATRIX
+ * MODULE 4: MANY-TO-MANY ANALYSIS & NEIGHBORHOOD EQUITY MATRIX
  * ============================================================================
  */
 function initRouteMatrixPipeline() {
@@ -159,7 +235,72 @@ function initRouteMatrixPipeline() {
         // 2. Restructure global tracking arrays into a spatial array configuration object.
         // 3. Formulate structural field masking declarations ('durationMillis', 'distanceMeters', 'condition').
         // 4. Call 'RouteMatrix.computeRouteMatrix' using the prepared execution arrays.
+        const { RouteMatrix } = await google.maps.importLibrary('routes');
 
+        const request = {
+            origins: origins.map(m => m.position),
+            destinations: destinations.map(m => m.position),
+            travelMode: 'DRIVING'
+        };
+
+        const fields = [ 'durationMillis', 'distanceMeters', 'condition' ];
+
+        RouteMatrix.computeRouteMatrix({ ...request, fields })
+            .then((response) => {
+                const originNames = origins.map((marker, index) =>
+                    marker.title || `Origin ${index + 1}`
+                );
+
+                let assessmentHtml = `
+                    <div class="site-details">
+                        <h5 class="mb-2 text-primary">Neighborhood Equity Assessment Results</h5>
+                `;
+
+                response.matrix.rows.forEach((row, originIndex) => {
+                    assessmentHtml += `
+                    <div class="mb-3">
+                        <p class="mb-1"><u>${originNames[originIndex]}:</u></p>
+                        <ul class="mb-0">
+                    `;
+
+                    row.items.forEach((item, destinationIndex) => {
+                        const isRouteValid = item.condition === 'ROUTE_EXISTS' && (!item.status || item.status.code === 0);
+                        const itemTitle = destinations[destinationIndex].title || `Destination ${destinationIndex + 1}`;
+
+                        if (isRouteValid) {
+                            const distanceKm = (item.distanceMeters / 1000).toFixed(2);
+                            const durationMins = Math.round(item.durationMillis / 60000);
+
+                            assessmentHtml += `
+                                <li>
+                                    <u>${itemTitle}</u><br>
+                                    ${distanceKm} km, ${durationMins} mins
+                                </li>
+                            `;
+                        } else {
+                            assessmentHtml += `
+                                <li>
+                                    <u>${itemTitle}</u>:
+                                    <span style="color: red;">NO ROUTE</span>
+                                </li>
+                            `;
+                        }
+                    });
+
+                    assessmentHtml += `</ul></div>`;
+                });
+
+                assessmentHtml += `</div>`;
+                document.getElementById('address-descriptor').innerHTML = assessmentHtml;
+            })
+            .catch((e) => {
+                document.getElementById('address-descriptor').innerHTML = `
+                    <div class="site-details">
+                        <h5 class="mb-1 text-danger">Neighborhood equity assessment failed</h5>
+                        <p class="mb-0">${e.message}</p>
+                    </div>
+                `;
+            });
         // END_STUDENT_TODO: TASK 8
     });
 }
@@ -167,9 +308,9 @@ initRouteMatrixPipeline();
 
 /**
  * ============================================================================
- * CHALLENGE 4 - SINGLE VEHICLE DISPATCH, ECO-ROUTING & TURN-BY-TURN
+ * MODULE 5: SINGLE VEHICLE DISPATCH, ECO-ROUTING & TURN-BY-TURN
  * ============================================================================
-*/
+ */
 function initRoutesV2Pipeline() {
     document.getElementById("optimize-btn").addEventListener("click", async () => {
         console.log("Dispatching Fleet via Routes API...");
@@ -185,10 +326,54 @@ function initRoutesV2Pipeline() {
             // 2. Implement the 'Route.computeRoutes' logic, factoring in destination arrays and dynamic travel settings.
             // 3. Add eco-routing options and intermediate waypoints dynamically to your payload configuration arrays.
             // 4. Call route.createPolylines() on the response object to overlay the encoded paths on the map context.
-            // HINT:  const { Route } = ...
+            const { Route } = await google.maps.importLibrary('routes');
 
+            activePolylines.forEach(p => p.setMap(null));
+            activePolylines = [];
+
+            const request = {
+                origin: origins[0].position,
+                destination: destinations[0].position,
+                travelMode: 'DRIVING',
+                routingPreference: 'TRAFFIC_AWARE',
+            };
+
+            const fields = ['durationMillis', 'distanceMeters', 'path', 'viewport'];
+
+            if (stopovers.length) {
+                request['intermediates'] = stopovers.map(m => m.position);
+                request['optimizeWaypointOrder'] = true;
+                fields.push('optimizedIntermediateWaypointIndices');
+            }
+
+            Route.computeRoutes({ ...request, fields })
+            .then((response) => {
+                const route = response.routes[0];
+
+                activePolylines = route.createPolylines();
+                activePolylines.forEach(polyline => {
+                    polyline.setOptions({
+                        icons: [{
+                            icon: {
+                                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                                fillColor: '#FFFFFF',
+                                fillOpacity: 1,
+                                strokeColor: '#000000',
+                                strokeWeight: 1,
+                                scale: 3
+                            },
+                            offset: '0',
+                            repeat: '50px'
+                        }]
+                    });
+                    polyline.setMap(map);
+                });
+
+                if (route.viewport) {
+                    map.fitBounds(route.viewport);
+                }
+            });
             // END_STUDENT_TODO: TASK 9
-
         } catch (error) {
             console.error("Route API error:", error);
             alert("Unable to optimize route.");
@@ -199,7 +384,7 @@ initRoutesV2Pipeline();
 
 /**
  * ============================================================================
- * CHALLENGE 5 - COMPREHENSIVE LOCALIZED SPATIAL DISCOVERY (NEARBY PLACES SEARCH)
+ * MODULE 6: COMPREHENSIVE LOCALIZED SPATIAL DISCOVERY (NEARBY PLACES SEARCH)
  * ============================================================================
  */
 async function findNearbyFacilities(lat, lng, types) {
@@ -208,13 +393,79 @@ async function findNearbyFacilities(lat, lng, types) {
     // 2. Build a native nearby extraction configuration model targeted at a center search position.
     // 3. Restrict output to field-masked arrays ('displayName', 'location', 'businessStatus').
     // 4. Execute the 'Place.searchNearby' query and iteratively plot standard civic markers.
+    const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
+    nearbyMarkers.forEach(m => m.setMap(null));
+    nearbyMarkers = [];
+
+    const center = new google.maps.LatLng(lat, lng);
+
+    const request = {
+        fields: ["displayName", "location", "businessStatus"],
+        locationRestriction: {
+            center: center,
+            radius: 3000,
+        },
+        includedPrimaryTypes: types,
+        maxResultCount: 20,
+        rankPreference: SearchNearbyRankPreference.DISTANCE,
+    };
+
+    console.log("Searching for nearby facilities at:", lat, lng);
+
+    try {
+        const { places } = await Place.searchNearby(request);
+
+        if (places.length) {
+            places.forEach((place) => {
+                const pin = new PinElement({
+                    glyphText: "🏢",
+                    background: "#4285F4",
+                    glyphColor: "white",
+                });
+
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: place.location,
+                    title: place.displayName,
+                    content: pin,
+                });
+
+                marker.addListener("click", () => {
+                    infoWindow.setContent(`
+                          <strong>${place.displayName}</strong><br>Nearby Facility<br>  
+                          ${getNavigationButtonsHtml('info')}
+                    `);
+                    infoWindow.open(map, marker);
+                    const readyListener = infoWindow.addListener("domready", () => {
+                        addNavigationButtonsListeners('info', marker);
+                        // Context clean up: remove the listener so it doesn't duplicate on subsequent actions
+                        google.maps.event.removeListener(readyListener);
+                    });
+                });
+
+                nearbyMarkers.push(marker);
+            });
+
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(center);
+            places.forEach(p => bounds.extend(p.location));
+            map.fitBounds(bounds);
+
+        } else {
+            alert("No nearby municipal facilities found.");
+        }
+    } catch (error) {
+        console.error("Nearby search failed:", error);
+        alert("Error searching for nearby facilities.");
+    }
     // END_STUDENT_TODO: TASK 10
 }
 
 /**
  * ============================================================================
- * CHALLENGE 6 - PIPELINES, LAYOUT OVERLAYS & STRUCTURAL INTEGRATION PARSERS
+ * UTILITY PIPELINES, LAYOUT OVERLAYS & STRUCTURAL INTEGRATION PARSERS
  * ============================================================================
  */
 function toggleCurrentWorks() {
@@ -230,14 +481,28 @@ function setDistrictStyle() {
     // START_STUDENT_TODO: TASK 11 - Declarative Data Layer Stylizer
     // Bind a functional execution engine inside 'map.data.setStyle' to dynamically theme
     // supervisorial polygons. Source the styling configurations directly from 'districtColors' based on 'sup_dist'.
-
+    map.data.setStyle((feature) => {
+        if (!isVisible) {
+            return { visible: false };
+        }
+        const districtId = feature.getProperty('sup_dist');
+        const color = districtColors[districtId] || "#FFFFFF";
+        return {
+            fillColor: color,
+            fillOpacity: 0.5,
+            strokeWeight: 2,
+            strokeColor: "#FFFFFF",
+            title: `District ${districtId}`
+        };
+    });
     // END_STUDENT_TODO: TASK 11
 }
 
 function resetGlobalView() {
     // START_STUDENT_TODO: TASK 12 - Viewport Reset Actions
     // Program map center position reset configurations back to core town hall coordinates.
-
+    map.setCenter({ lat: 37.7749, lng: -122.4194 });
+    map.setZoom(12);
     // END_STUDENT_TODO: TASK 12
 
     document.getElementById('district-toggle').selected = true;
@@ -377,7 +642,7 @@ async function renderCurrentWorks() {
                     `;
                     document.getElementById('address-descriptor').innerHTML = content;
 
-                    addNearbyButtonListeners(['transit_depot']);
+                    addNearbyButtonListeners([ 'transit_depot' ]);
                     addNavigationButtonsListeners('works', marker);
                 });
 

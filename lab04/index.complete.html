@@ -35,7 +35,7 @@
                 <span class="material-symbols-outlined">map</span>
                 <span class="nav-label">City Infrastructure</span>
             </div>
-            <div class="nav-item-global active" onclick="showLab('lab2')">
+            <div class="nav-item-global" onclick="showLab('lab2')">
                 <span class="material-symbols-outlined">security</span>
                 <span class="nav-label">Citizen Resource & Integrity</span>
             </div>
@@ -43,7 +43,7 @@
                 <span class="material-symbols-outlined">commute</span>
                 <span class="nav-label">Civic Mobility & Logistics</span>
             </div>
-            <div class="nav-item-global" onclick="showLab('lab4')">
+            <div class="nav-item-global active" onclick="showLab('lab4')">
                 <span class="material-symbols-outlined">engineering</span>
                 <span class="nav-label">Public Works & Urban Transportation</span>
             </div>
@@ -52,39 +52,44 @@
         <div id="lab-workspace" class="workspace">
 
             <!-- THE LAB SECTION STARTS HERE -->
-            <div class="content-container">
-                <section class="lab-section">
-                    <h3>Smart Address Entry</h3>
-                    <p class="section-description"> Citizens use this box to find their home for service registration.
-                    </p>
-                    <div id="autocomplete-container"></div>
-                    <div id="selected-place-details" class="details-panel" style="display:none;"><strong>Selected
-                            Location:</strong> <span id="place-name"></span> <br> <strong>Address:</strong> <span
-                            id="place-address"></span></div>
-                </section>
-                <section class="lab-section">
-                    <h3>Data Integrity</h3>
-                    <md-filled-button id="validate-btn"> Validate Current Address</md-filled-button>
-                    <div id="validation-result" class="validation-result"></div>
-                </section>
-                <section class="lab-section">
-                    <h3>Infrastructure Command Center</h3>
-                    <div class="command-layout">
-                        <div class="map-column">
-                            <div id="map"></div>
+            <div class="dashboard">
+                <aside class="sidebar">
+                    <h2> Civic Dispatch Center </h2>
+                    <section class="control-group">
+                        <h3> 1. District Visualization </h3>
+                        <div class="switch-row"><label for="district-toggle"> Show Maintenance Districts </label>
+                            <md-switch id="district-toggle" selected></md-switch>
                         </div>
-                        <div class="resource-column">
-                            <h5>Resource Filters</h5>
-                            <div class="button-stack">
-                                <md-outlined-button id="locate-me"> Find My Position</md-outlined-button>
-                                <md-outlined-button id="find-clinics"> Nearby Health Clinics</md-outlined-button>
-                                <md-outlined-button id="find-ev"> City EV Infrastructure</md-outlined-button>
-                            </div>
-                            <hr>
-                            <div id="results-list" class="results-list"></div>
+                        <div class="switch-row"><label for="works-toggle"> Show Current Works </label>
+                            <md-switch id="works-toggle"></md-switch>
+                        </div>
+                    </section>
+                    <section class="control-group">
+                        <h3> 2. Asset Validation & Intake </h3>
+                        <div id="autocomplete-container"><input id="address-input" type="text"
+                                placeholder="Enter repair site address..."></div>
+                        <md-filled-button id="validate-btn"> Verify & Plot Asset</md-filled-button>
+                        <div id="validation-output" class="status-box"></div>
+                    </section>
+                    <section class="control-group">
+                        <h3> 3. Service Desert Analysis </h3>
+                        <md-filled-button id="matrix-btn"> Calculate Response Times</md-filled-button>
+                        <div id="matrix-output" class="status-box"></div>
+                    </section>
+                    <section class="control-group">
+                        <h3> 4. Fleet Optimization </h3>
+                        <md-filled-button id="optimize-btn"> Calculate Route</md-filled-button>
+                    </section>
+                    <md-outlined-button id="reset-btn"> Reset Global View</md-outlined-button>
+                </aside>
+                <main class="map-container">
+                    <div id="map"></div>
+                    <div id="pano-container">
+                        <div id="pano">
+                            <div id="address-descriptor"> Select a marker for landmark info</div>
                         </div>
                     </div>
-                </section>
+                </main>
             </div>
             <!-- THE LAB SECTION ENDS HERE -->
 
@@ -96,7 +101,7 @@
                 <h2>NOT AVAILABLE IN THIS LAB</h2>
                 <p>
                     <!-- THE LAB NUMBER ON THE NEXT LINE -->
-                    Please switch back to Lab 2
+                    Please switch back to Lab 4
                     to continue your Maps API work.
                 </p>
             </div>
@@ -123,8 +128,7 @@
                 }));
             d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
         })({
-            // TODO: Replace "INSERT_YOUR_API_KEY_HERE" with the "API KEY" you just created 
-            key: "INSERT_YOUR_API_KEY_HERE",
+            key: "AIzaSyA9h_-v5NsUPfVV3P1vK9ph60fs9u8qkp8",
             v: "weekly",
             // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
             // Add other bootstrap parameters as needed, using camel case.
