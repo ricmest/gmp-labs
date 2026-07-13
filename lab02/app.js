@@ -36,6 +36,10 @@ async function initLab() {
 
         // END TASK 5: Address validation
 
+    });
+
+    document.getElementById("locate-me").addEventListener("click", () => {
+
         // TASK 6: Geolocation
         // TODO: Add the "Find my position" feature to the map
 
