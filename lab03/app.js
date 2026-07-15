@@ -42,10 +42,10 @@ async function dispatchServiceCallResponse() {
 
     await setOrigin(originTransportAgencyCoords, originTransportAgencyName);
 
-    // TASK 4: Send a request to get traffic aware routing between two points
+    // TASK 4: Emergency Service Dispatch (Traffic-Aware Routing)
     // TODO: Configure a TRAFFIC_AWARE request and calculate the route
 
-    // END TASK 4: Send a request to get traffic aware routing between two points
+    // END TASK 4: Emergency Service Dispatch (Traffic-Aware Routing)
 }
 
 /**
@@ -62,10 +62,10 @@ async function optimizeHealthClinic() {
 
     await setOrigin(originGeneralHospitalCoords, originGeneralHospitalName);
 
-    // TASK 5: Send a request to get an optimized route along several waypoints
+    // TASK 5: Mobile Clinic Optimization (Waypoint Optimization)
     // TODO: enable optimization and process the reordered waypoints
 
-    // END TASK 5. Send a request to get an optimized route along several waypoints
+    // END TASK 5: Mobile Clinic Optimization (Waypoint Optimization)
 }
 
 /**
@@ -106,7 +106,7 @@ async function analyzeEnvironmentalImpact() {
     // TODO: Send a request to calculate fuel consumption and toll costs
 
 
-    // END TASK 7. Send a request to calculate fuel consumption and toll costs
+    // END TASK 7: Sustainability & Environmental Impact
 }
 
 /**
@@ -127,7 +127,7 @@ async function assessNeighborhoodEquity() {
     // TASK 8: Transit Equity Assessment (Route Matrix)
     // TODO: Send a request to get a matrix of routes between given origins and destinations
 
-    // END TASK 8. Send a request to get a matrix of routes between given origins and destinations
+    // END TASK 8: Transit Equity Assessment (Route Matrix)
 }
 
 /**
@@ -178,7 +178,7 @@ async function modelPeakInfrastructure() {
     // TODO: Send a request to calculate route time based on time of day
 
 
-    // END TASK 9. Send a request to calculate route time based on time of day
+    // END TASK 9: Peak Congestion Modeling (Predictive Traffic)
 }
 
 function logEntry(msg) {
