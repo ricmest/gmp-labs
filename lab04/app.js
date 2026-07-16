@@ -172,8 +172,7 @@ async function initAutocompletePipeline() {
             // START_STUDENT_TODO: TASK 7 - Address Validation API Implementation
             // 1. Import 'addressValidation' and 'marker' libraries.
             // 2. Formulate and submit an address validation request using 'AddressValidation.fetchAddressValidation'.
-            // 3. Construct a custom 'PinElement' instance to style the resulting verified asset geocode.
-            // 4. Instantiate an 'AdvancedMarkerElement' to render the output position onto the active map view.
+            // 3. Pass the response to 'handleAddressValidationResponse' for plotting and display.
 
             // END_STUDENT_TODO: TASK 7
 
@@ -365,7 +364,8 @@ async function findNearbyFacilities(lat, lng, types) {
     // 2. Build a native nearby extraction configuration model targeted at a center search position.
     // 3. Restrict output to field-masked arrays ('displayName', 'location', 'businessStatus').
     // 4. Execute the 'Place.searchNearby' query
-    // 5. Iterate over each nearby place and pass it to the 'handleNearbyPlace' handler
+    // 5. Iterate over each nearby place and pass it to 'handleNearbyPlace' to render on the map
+    // 6. Fit the map bounds to the extracted locations
 
     // END_STUDENT_TODO: TASK 10
 }

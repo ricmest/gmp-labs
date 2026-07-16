@@ -195,8 +195,7 @@ async function initAutocompletePipeline() {
             // START_STUDENT_TODO: TASK 7 - Address Validation API Implementation
             // 1. Import 'addressValidation' and 'marker' libraries.
             // 2. Formulate and submit an address validation request using 'AddressValidation.fetchAddressValidation'.
-            // 3. Construct a custom 'PinElement' instance to style the resulting verified asset geocode.
-            // 4. Instantiate an 'AdvancedMarkerElement' to render the output position onto the active map view.
+            // 3. Pass the response to 'handleAddressValidationResponse' for plotting and display.
             const { AddressValidation } = await google.maps.importLibrary("addressValidation");
 
             const request = {
@@ -448,9 +447,8 @@ async function findNearbyFacilities(lat, lng, types) {
     // 2. Build a native nearby extraction configuration model targeted at a center search position.
     // 3. Restrict output to field-masked arrays ('displayName', 'location', 'businessStatus').
     // 4. Execute the 'Place.searchNearby' query
-    // 5. Iterate over each nearby place and create an AdvancedMarkerElement with a custom PinElemen
-    // 6. Add the marker to the nearbyMarkers array
-    // 7. Fit the map bounds to the extracted locations
+    // 5. Iterate over each nearby place and pass it to 'handleNearbyPlace' to render on the map
+    // 6. Fit the map bounds to the extracted locations
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
 
     const center = new google.maps.LatLng(lat, lng);
