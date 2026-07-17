@@ -27,7 +27,7 @@ const districtColors = {
 
 /**
  * ============================================================================
- * CHALLENGE 1 - INITIALIZATION, WEB COMPONENTS & DATA LAYERS
+ * CHALLENGE 1 - CORE MAP INITIALIZATION & DATA LAYERS
  * ============================================================================
 */
 async function initMap() {
@@ -214,7 +214,7 @@ async function findNearbyFacilities(lat, lng, types) {
 
 /**
  * ============================================================================
- * CHALLENGE 6 - PIPELINES, LAYOUT OVERLAYS & STRUCTURAL INTEGRATION PARSERS
+ * CHALLENGE 6 - STYLING & VIEWPORT CONTROL
  * ============================================================================
  */
 function toggleCurrentWorks() {
