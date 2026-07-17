@@ -4,7 +4,9 @@
  */
 
 // Global State Tracker Arrays & Objects
-let map, addressMarker, infoWindow;
+let map; // Store the map instance here
+let addressMarker; // Store the validated address marker here
+let infoWindow; // Use this to display marker details
 let origins = [], destinations = [], stopovers = [];
 let activePolylines = [];
 let currentWorks = [];
@@ -41,6 +43,7 @@ async function initMap() {
     // Initialize the Map instance targeted at the DOM element with ID "map".
     // Configure it centered at San Francisco (37.7749, -122.4194), zoom 12,
     // and bind your Cloud-based Custom Map ID (mapId) to enable Advanced Markers.
+    // Store your Map instance in the global `map` variable for later use.
 
     // END_STUDENT_TODO: TASK 2
 
@@ -85,12 +88,6 @@ async function initAutocompletePipeline() {
     container.innerHTML = "";
     container.appendChild(autocomplete);
 
-    // START_STUDENT_TODO: TASK 6 - Autocomplete Event Processing
-    // Add a 'gmp-select' listener to the Autocomplete element.
-    // Use place.fetchFields to request the 'displayName', 'location', and 'formattedAddress' fields.
-
-    // END_STUDENT_TODO: TASK 6
-
     // Handle UI layout plotting for autocomplete selections
     const plotPlace = async (place) => {
         const { PinElement, AdvancedMarkerElement } = await google.maps.importLibrary("marker");
@@ -116,6 +113,54 @@ async function initAutocompletePipeline() {
             `<div class="alert alert-success mt-2">Selected: ${place.formattedAddress}</div>`;
     };
 
+    // START_STUDENT_TODO: TASK 6 - Autocomplete Event Processing
+    // Add a 'gmp-select' listener to the Autocomplete element.
+    // Use place.fetchFields to request the 'displayName', 'location', and 'formattedAddress' fields.
+
+    // END_STUDENT_TODO: TASK 6
+
+    const handleAddressValidationResponse = async (response) => {
+        const { PinElement, AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+        const { location } = response.geocode;
+        const formattedAddress = response.address.formattedAddress;
+
+        const munsIcon = new PinElement({
+            glyphText: "⌂",
+            background: "#C2185B",
+            borderColor: "#880E4F",
+            glyphColor: "white"
+        });
+
+        if (addressMarker) addressMarker.setMap(null);
+
+        addressMarker = new AdvancedMarkerElement({
+            map: map,
+            position: location,
+            content: munsIcon,
+            title: formattedAddress
+        });
+
+        // Attach dynamic contextual operational panel dispatch configuration triggers
+        addressMarker.addListener("click", async () => {
+            const content = `
+                <div class="site-details">
+                    <h5 class="mb-1 text-primary">${formatPostalAddressDetails(response.address.postalAddress)}</h5>
+                    ${getNearbyButtonHtml(location)}
+                    ${getNavigationButtonsHtml('address')}                        
+                </div>
+            `;
+            document.getElementById('address-descriptor').innerHTML = content;
+
+            addNearbyButtonListeners(["government_office", "local_government_office"]);
+            addNavigationButtonsListeners('address', addressMarker);
+        });
+
+        map.setCenter(addressMarker.position);
+        map.setZoom(16);
+        document.getElementById('validation-output').innerHTML =
+            `<div class="alert alert-success mt-2">Validated: ${formattedAddress}</div>`;
+    }
+
     // Bind Address Validation API Processing Trigger
     document.getElementById("validate-btn").addEventListener("click", async () => {
         const userInput = autocomplete.value;
@@ -127,8 +172,7 @@ async function initAutocompletePipeline() {
             // START_STUDENT_TODO: TASK 7 - Address Validation API Implementation
             // 1. Import 'addressValidation' and 'marker' libraries.
             // 2. Formulate and submit an address validation request using 'AddressValidation.fetchAddressValidation'.
-            // 3. Construct a custom 'PinElement' instance to style the resulting verified asset geocode.
-            // 4. Instantiate an 'AdvancedMarkerElement' to render the output position onto the active map view.
+            // 3. Pass the response to 'handleAddressValidationResponse' for plotting and display.
 
             // END_STUDENT_TODO: TASK 7
 
@@ -145,6 +189,55 @@ async function initAutocompletePipeline() {
  * CHALLENGE 3 -  MANY-TO-MANY ANALYSIS & NEIGHBORHOOD EQUITY MATRIX
  * ============================================================================
  */
+
+const handleRouteMatrixResponse = (response) => {
+    const originNames = origins.map((marker, index) =>
+        marker.title || `Origin ${index + 1}`
+    );
+
+    let assessmentHtml = `
+        <div class="site-details">
+            <h5 class="mb-2 text-primary">Neighborhood Equity Assessment Results</h5>
+    `;
+
+    response.matrix.rows.forEach((row, originIndex) => {
+        assessmentHtml += `
+        <div class="mb-3">
+            <p class="mb-1"><u>${originNames[originIndex]}:</u></p>
+            <ul class="mb-0">
+        `;
+
+        row.items.forEach((item, destinationIndex) => {
+            const isRouteValid = item.condition === 'ROUTE_EXISTS' && (!item.status || item.status.code === 0);
+            const itemTitle = destinations[destinationIndex].title || `Destination ${destinationIndex + 1}`;
+
+            if (isRouteValid) {
+                const distanceKm = (item.distanceMeters / 1000).toFixed(2);
+                const durationMins = Math.round(item.durationMillis / 60000);
+
+                assessmentHtml += `
+                    <li>
+                        <u>${itemTitle}</u><br>
+                        ${distanceKm} km, ${durationMins} mins
+                    </li>
+                `;
+            } else {
+                assessmentHtml += `
+                    <li>
+                        <u>${itemTitle}</u>:
+                        <span style="color: red;">NO ROUTE</span>
+                    </li>
+                `;
+            }
+        });
+
+        assessmentHtml += `</ul></div>`;
+    });
+
+    assessmentHtml += `</div>`;
+    document.getElementById('address-descriptor').innerHTML = assessmentHtml;
+}
+
 function initRouteMatrixPipeline() {
     document.getElementById("matrix-btn").addEventListener("click", async () => {
         console.log("Analyzing Response Matrix...");
@@ -170,6 +263,34 @@ initRouteMatrixPipeline();
  * CHALLENGE 4 - SINGLE VEHICLE DISPATCH, ECO-ROUTING & TURN-BY-TURN
  * ============================================================================
 */
+
+const handleComputeRoutesResponse = (response) => {
+    const route = response.routes[0];
+
+    activePolylines = route.createPolylines();
+    activePolylines.forEach(polyline => {
+        polyline.setOptions({
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    fillColor: '#FFFFFF',
+                    fillOpacity: 1,
+                    strokeColor: '#000000',
+                    strokeWeight: 1,
+                    scale: 3
+                },
+                offset: '0',
+                repeat: '50px'
+            }]
+        });
+        polyline.setMap(map);
+    });
+
+    if (route.viewport) {
+        map.fitBounds(route.viewport);
+    }
+}
+
 function initRoutesV2Pipeline() {
     document.getElementById("optimize-btn").addEventListener("click", async () => {
         console.log("Dispatching Fleet via Routes API...");
@@ -202,12 +323,49 @@ initRoutesV2Pipeline();
  * CHALLENGE 5 - LOCALIZED SPATIAL DISCOVERY
  * ============================================================================
  */
+
+const handleNearbyPlace = async (place) => {
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    const pin = new PinElement({
+        glyphText: "🏢",
+        background: "#4285F4",
+        glyphColor: "white",
+    });
+
+    const marker = new AdvancedMarkerElement({
+        map,
+        position: place.location,
+        title: place.displayName,
+        content: pin,
+    });
+
+    marker.addListener("click", () => {
+        infoWindow.setContent(`
+              <strong>${place.displayName}</strong><br>Nearby Facility<br>  
+              ${getNavigationButtonsHtml('info')}
+        `);
+        infoWindow.open(map, marker);
+        const readyListener = infoWindow.addListener("domready", () => {
+            addNavigationButtonsListeners('info', marker);
+            // Context clean up: remove the listener so it doesn't duplicate on subsequent actions
+            google.maps.event.removeListener(readyListener);
+        });
+    });
+
+    nearbyMarkers.push(marker);
+}
+
 async function findNearbyFacilities(lat, lng, types) {
+    nearbyMarkers.forEach(m => m.setMap(null));
+    nearbyMarkers = [];
+
     // START_STUDENT_TODO: TASK 10 - Next-Gen Nearby Place Search (New) Implementation
     // 1. Import 'places' and 'marker' libraries.
     // 2. Build a native nearby extraction configuration model targeted at a center search position.
     // 3. Restrict output to field-masked arrays ('displayName', 'location', 'businessStatus').
-    // 4. Execute the 'Place.searchNearby' query and iteratively plot standard civic markers.
+    // 4. Execute the 'Place.searchNearby' query
+    // 5. Iterate over each nearby place and pass it to 'handleNearbyPlace' to render on the map
+    // 6. Fit the map bounds to the extracted locations
 
     // END_STUDENT_TODO: TASK 10
 }
