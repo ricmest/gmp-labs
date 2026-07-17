@@ -199,7 +199,7 @@ initRoutesV2Pipeline();
 
 /**
  * ============================================================================
- * CHALLENGE 5 - COMPREHENSIVE LOCALIZED SPATIAL DISCOVERY (NEARBY PLACES SEARCH)
+ * CHALLENGE 5 - LOCALIZED SPATIAL DISCOVERY
  * ============================================================================
  */
 async function findNearbyFacilities(lat, lng, types) {
